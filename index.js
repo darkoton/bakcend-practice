@@ -1,22 +1,42 @@
-const http = require('http');
-const port = 3000;
 
-const server = http.createServer((req, res) => {
-   res.writeHead(200, {'Content-Type': 'text/html'});
-   const url = req.url;
-    if(url ==='/about'){
-       res.write('<h1>about us page<h1>');
-       res.end(); 
-    }else if(url ==='/contact'){
-       res.write('<h1>contact us page<h1>');
-       res.end(); 
-    }else{
-       res.write('<h1>Hello World!<h1>');
-       res.write('<h2>My name Artem<h2>'); 
-       res.end(); 
-    }
+const express = require('express');
+
+const app = express();
+
+// Hardcoded in-memory products array
+const products = [
+    { id: 1, name: 'Product 1', brand: 'Brand A' },
+    { id: 2, name: 'Product 2', brand: 'Brand B' },
+    { id: 3, name: 'Product 3', brand: 'Brand A' }
+];
+
+// Middleware for all routes
+app.use((request, response, next) => {
+    console.log(request.method, request.url);
+    next();
 });
 
-server.listen(port, () => {
- console.log(`server start at http://localhost:${port}/`);
+// GET request on root path
+app.get('/', (request, response) => {
+    response.send('response for GET request');
+});
+
+// Route with parameter to get products by brand
+app.get('/products/:brand', (req, res) => {
+    const { brand } = req.params;
+
+    // Filter products by brand
+    const filteredProducts = products.filter(
+        product => product.brand === brand
+    );
+
+    // Send filtered products as JSON
+    res.json(filteredProducts);
+});
+
+// Start the server
+const PORT = 3000;
+
+app.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}.`);
 });
